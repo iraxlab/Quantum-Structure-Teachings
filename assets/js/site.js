@@ -45,6 +45,31 @@
   });
   paintDone();
 
+  /* ---------- seasons: open / close, studied counts ---------- */
+  var openSeasons = load("qt-season", {});
+  var seasonItems = Array.prototype.slice.call(document.querySelectorAll(".seasons > li.season"));
+  function setSeason(li, on, remember) {
+    li.classList.toggle("open", on);
+    var h = li.querySelector(".season-head");
+    if (h) h.setAttribute("aria-expanded", on ? "true" : "false");
+    if (remember) { openSeasons[li.getAttribute("data-season")] = on; save("qt-season", openSeasons); }
+  }
+  seasonItems.forEach(function (li) {
+    var k = li.getAttribute("data-season");
+    var hasActive = !!li.querySelector("li.active");
+    if (!hasActive && k in openSeasons) setSeason(li, !!openSeasons[k], false);
+    var h = li.querySelector(".season-head");
+    if (h) h.addEventListener("click", function () { setSeason(li, !li.classList.contains("open"), true); });
+  });
+  function paintSeasonCounts() {
+    document.querySelectorAll("[data-season-keys]").forEach(function (el) {
+      var keys = el.getAttribute("data-season-keys").split(" ");
+      el.textContent = keys.filter(function (k) { return !!done[k]; }).length;
+    });
+  }
+  paintSeasonCounts();
+  document.querySelectorAll(".toggle-done").forEach(function (b) { b.addEventListener("click", paintSeasonCounts); });
+
   /* ---------- expand / collapse sections in the sidebar ---------- */
   var openSecs = load("qt-open", {});
   function setOpen(li, on, remember) {
@@ -64,7 +89,10 @@
     });
   });
   var ea = document.getElementById("expand-all"), ca = document.getElementById("collapse-all");
-  if (ea) ea.addEventListener("click", function () { secItems.forEach(function (li) { setOpen(li, true, true); }); });
+  if (ea) ea.addEventListener("click", function () {
+    seasonItems.forEach(function (li) { if (li.querySelector(".secnav")) setSeason(li, true, true); });
+    secItems.forEach(function (li) { setOpen(li, true, true); });
+  });
   if (ca) ca.addEventListener("click", function () { secItems.forEach(function (li) { setOpen(li, false, true); }); });
 
   /* ---------- highlight current part in the sidebar ---------- */
