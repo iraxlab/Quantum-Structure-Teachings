@@ -203,7 +203,7 @@
     if (!res.length) html += '<p class="sr-snip">Nothing found. Try a single word, like <em>gratitude</em> or <em>zero point</em>.</p>';
     res.forEach(function (r, i) {
       var e = r.e;
-      var where = e.s ? "Section " + e.s + " · " : "Toolkit · ";
+      var where = e.s ? (e.sl || ("Section " + e.s)) + " · " : "Toolkit · ";
       html += '<a class="sr-item" data-i="' + i + '" href="' + e.url + '"><div class="sr-meta">' + where + (kindLabel[e.kind] || "") +
               '</div><div class="sr-title">' + highlight(e.title, terms) + '</div><div class="sr-snip">' +
               highlight(snippet(e.text, terms[0]), terms) + "</div></a>";
